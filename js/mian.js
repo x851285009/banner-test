@@ -4,7 +4,8 @@ var container = document.getElementById('container'),//获取父级控制器容�
     next = document.getElementById('next'),//获取下一张按钮
     indicatorItem = document.getElementById('indicator').getElementsByTagName('i'),//获取圆点存入数组
     index = 0,//创建图片索引默认为0表示为展示第一张
-    timer;//存储计时器
+    run,
+    timer,timerC;//存储计时器
 
 //获取父级容器的宽度
 var containerStyle = window.getComputedStyle(container,null);
@@ -47,7 +48,7 @@ for(var i=0; i<indicatorItem.length; i++){
             var endLeft = -width * index;
             var left = startLeft;
             if(startLeft > endLeft){
-                var timer = setInterval(function(){
+                timer = setInterval(function(){
                     left -=79;
                     ul.style.left = left + 'px';
                     if (left <= endLeft){
@@ -70,36 +71,46 @@ for(var i=0; i<indicatorItem.length; i++){
 }
 //点击前一张
 prev.onclick = function () {
+    if(run){
+    return;
+    }
     index--;
     if(index < 0){
         index = num -1;
     }
+    run = true;
     //无缝切换动画
     var ulStyle = window.getComputedStyle(ul,null);
     var startLeft = parseInt(ulStyle.left);
     var endLeft = -width * index;
     var left = startLeft;
     if(index == 7){
-        var timer = setInterval(function(){
+        timerC = setInterval(function(){
             left -=553;
             ul.style.left = left + 'px';
             if (left <= endLeft){
-                clearInterval(timer);
+                clearInterval(timerC);
+                run = false;
             }
         },25);
     }else{
-        var timer = setInterval(function(){
+        timerC = setInterval(function(){
             left +=79;
             ul.style.left = left + 'px';
             if (left >= endLeft){
-                clearInterval(timer);
+                run = false;
+                clearInterval(timerC);
             }
-        },30);
+        },20);
     }
     indicatorA();
 };
 //点击后一张
 next.onclick = function () {
+    if(run){
+        return
+    }
+    run = true;
     index++;
     if(index > (num-1)){
         index = 0;
@@ -109,23 +120,25 @@ next.onclick = function () {
     var startLeft = parseInt(ulStyle.left);
     var endLeft = -width * index;
     var left = startLeft;
-    if(index == 0){
-        var timer = setInterval(function(){
-            left +=553;
-            ul.style.left = left + 'px';
-            if (left >= endLeft){
-                clearInterval(timer);
-            }
-        },25);
-    }else{
-        var timer = setInterval(function(){
-            left -=79;
-            ul.style.left = left + 'px';
-            if (left <= endLeft){
-                clearInterval(timer);
-            }
-        },30);
-    }
+        if (index == 0) {
+            timerC = setInterval(function () {
+                left += 553;
+                ul.style.left = left + 'px';
+                if (left >= endLeft) {
+                    run = false;
+                    clearInterval(timerC);
+                }
+            }, 25);
+        } else {
+            timerC = setInterval(function () {
+                left -= 79;
+                ul.style.left = left + 'px';
+                if (left <= endLeft) {
+                    run = false
+                    clearInterval(timerC);
+                }
+            }, 20);
+        }
     indicatorA();
 };
 function play() {
